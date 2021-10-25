@@ -64,7 +64,7 @@ rules.heading = {
   filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
 
   replacement: function (content, node, options) {
-    var hLevel = Number(node.nodeName.charAt(1));
+    var hLevel = Number(node.nodeName.charAt(1)) + 1;
 
     if (options.headingStyle === 'setext' && hLevel < 3) {
       var underline = repeat((hLevel === 1 ? '=' : '-'), content.length);
@@ -78,7 +78,7 @@ rules.heading = {
 };
 
 rules.blockquote = {
-  filter: 'blockquote',
+  filter: ['blockquote', '.versetext'],
 
   replacement: function (content) {
     content = content.replace(/^\n+|\n+$/g, '');
@@ -358,9 +358,11 @@ function findRule (rules, node, options) {
 function filterValue (rule, node, options) {
   var filter = rule.filter;
   if (typeof filter === 'string') {
-    if (filter === node.nodeName.toLowerCase()) return true
+    if (filter === node.nodeName.toLowerCase() || node.matches(filter)) return true
   } else if (Array.isArray(filter)) {
-    if (filter.indexOf(node.nodeName.toLowerCase()) > -1) return true
+    for (let subFilter of filter) {
+      if (subFilter === node.nodeName.toLowerCase() || node.matches(subFilter)) return true
+    }
   } else if (typeof filter === 'function') {
     if (filter.call(rule, node, options)) return true
   } else {
