@@ -733,7 +733,9 @@ TurndownService.prototype = {
     }
 
     if (input === '') return ''
-
+    for (const x of ["style", "script"]) {
+      this.remove(x);
+    }
     var output = process.call(this, new RootNode(input));
     return postProcess.call(this, output)
   },
@@ -890,8 +892,9 @@ function postProcess (output) {
       output = join(output, rule.append(self.options));
     }
   });
-
-  return output.replace(/^[\t\r\n]+/, '').replace(/[\t\r\n\s]+$/, '')
+  output = output.replace(/^[\t\r\n]+/, '').replace(/[\t\r\n\s]+$/, '');
+  output = output.replace(" ", " ");
+  return output;
 }
 
 /**
